@@ -3,7 +3,6 @@
 import { Section, Cell, Image, List } from "@telegram-apps/telegram-ui";
 
 import { Link } from "@/components/Link/Link";
-import { Button } from "@/components/ui/button";
 
 import tonSvg from "./_assets/ton.svg";
 
@@ -11,8 +10,6 @@ export default function Home() {
   return (
     <List>
       <h1 className="text-3xl font-bold underline">Instant Send App</h1>
-      <Button>Click me</Button>
-
       <Section
         header="Features"
         footer="You can use these pages to learn more about features, provided by Telegram Mini Apps and other useful projects"
