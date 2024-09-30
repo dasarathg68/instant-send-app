@@ -4,7 +4,6 @@ import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { derivePath } from "ed25519-hd-key";
 import { Keypair } from "@solana/web3.js";
 import { toast } from "sonner";
-
 import nacl from "tweetnacl";
 export interface Wallet {
   publicKey: string;

@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { generateMnemonic, validateMnemonic } from "bip39";
 import { motion } from "framer-motion";
 import {
   ChevronDown,
@@ -27,7 +26,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
-import { generateWalletFromMnemonic, Wallet } from "../utils/wallet";
+import {
+  generateWalletFromMnemonic,
+  Wallet,
+  createMnemonic,
+  validateWalletMnemonic,
+} from "../utils/wallet";
 
 // Add a new prop for network
 interface WalletGeneratorProps {
@@ -117,12 +121,12 @@ const WalletGenerator: React.FC<WalletGeneratorProps> = ({ network }) => {
     let mnemonic = mnemonicInput.trim();
 
     if (mnemonic) {
-      if (!validateMnemonic(mnemonic)) {
+      if (!validateWalletMnemonic(mnemonic)) {
         toast.error("Invalid recovery phrase. Please try again.");
         return;
       }
     } else {
-      mnemonic = generateMnemonic();
+      mnemonic = createMnemonic();
     }
 
     const words = mnemonic.split(" ");
