@@ -6,17 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, Copy, Eye, EyeOff } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
+
 import {
   generateWalletFromMnemonic,
   Wallet,
@@ -26,15 +16,20 @@ import {
 
 // Add a new prop for network
 interface WalletGeneratorProps {
-  network: "ethereum" | "solana";
+  network: "Ethereum" | "Solana";
+  wallet: Wallet | null;
+  onWalletCreated: (wallet: Wallet) => void;
 }
 
-const WalletGenerator: React.FC<WalletGeneratorProps> = ({ network }) => {
+const WalletGenerator: React.FC<WalletGeneratorProps> = ({
+  network,
+  wallet,
+  onWalletCreated,
+}) => {
   const [mnemonicWords, setMnemonicWords] = useState<string[]>(
     Array(12).fill(" ")
   );
   const [pathType, setPathType] = useState<string>("501"); // Default to Solana path
-  const [wallet, setWallet] = useState<Wallet | null>(null);
   const [showMnemonic, setShowMnemonic] = useState<boolean>(false);
   const [mnemonicInput, setMnemonicInput] = useState<string>("");
   const [visiblePrivateKey, setVisiblePrivateKey] = useState<boolean>(false);
@@ -48,7 +43,7 @@ const WalletGenerator: React.FC<WalletGeneratorProps> = ({ network }) => {
 
   // Set default path based on the network prop
   useEffect(() => {
-    setPathType(network === "ethereum" ? "60" : "501");
+    setPathType(network === "Ethereum" ? "60" : "501");
   }, [network]);
 
   const pathTypeName = pathTypeNames[pathType] || "";
@@ -58,17 +53,10 @@ const WalletGenerator: React.FC<WalletGeneratorProps> = ({ network }) => {
     const storedWallet = localStorage.getItem(`${network}_wallet`);
 
     if (storedWallet) {
-      setWallet(JSON.parse(storedWallet));
+      onWalletCreated(JSON.parse(storedWallet));
       setVisiblePrivateKey(false);
     }
   }, [network]);
-
-  const handleDeleteWallet = () => {
-    localStorage.removeItem(`${network}_wallet`);
-    setWallet(null);
-    setMnemonicWords(Array(12).fill(" "));
-    toast.success("Wallet deleted successfully!");
-  };
 
   const copyToClipboard = (content: string) => {
     navigator.clipboard.writeText(content);
@@ -99,7 +87,7 @@ const WalletGenerator: React.FC<WalletGeneratorProps> = ({ network }) => {
 
     const newWallet = generateWalletFromMnemonic(pathType, mnemonic, 0); // Only 1 account (index 0)
     if (newWallet) {
-      setWallet(newWallet);
+      onWalletCreated(newWallet);
       localStorage.setItem(`${network}_wallet`, JSON.stringify(newWallet));
       toast.success("Wallet generated successfully!");
 
@@ -219,84 +207,6 @@ const WalletGenerator: React.FC<WalletGeneratorProps> = ({ network }) => {
       )}
 
       {/* Display wallet details */}
-      {wallet && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            delay: 0.3,
-            duration: 0.3,
-            ease: "easeInOut",
-          }}
-          className="flex flex-col gap-8 mt-6"
-        >
-          <div className="flex justify-between w-full gap-4 items-center">
-            <h2 className="tracking-tighter text-3xl md:text-4xl font-extrabold">
-              {pathTypeName} Wallet
-            </h2>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="self-end">
-                  Delete Wallet
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Are you sure you want to delete this wallet?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your wallet and keys from local storage.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteWallet}>
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-          <div className="flex flex-col gap-8 px-8 py-4 rounded-2xl bg-secondary/50">
-            <div
-              className="flex flex-col w-full gap-2"
-              onClick={() => copyToClipboard(wallet.publicKey)}
-            >
-              <span className="text-lg md:text-xl font-bold tracking-tighter">
-                Public Key
-              </span>
-              <p className="text-primary/80 font-medium cursor-pointer hover:text-primary transition-all duration-300 truncate">
-                {wallet.publicKey}
-              </p>
-            </div>
-            <div className="flex flex-col w-full gap-2">
-              <span className="text-lg md:text-xl font-bold tracking-tighter">
-                Private Key
-              </span>
-              <div className="flex justify-between w-full items-center gap-2">
-                <p
-                  onClick={() => copyToClipboard(wallet.privateKey)}
-                  className="text-primary/80 font-medium cursor-pointer hover:text-primary transition-all duration-300 truncate"
-                >
-                  {visiblePrivateKey ? wallet.privateKey : "•".repeat(12)}
-                </p>
-                <Button
-                  variant="ghost"
-                  onClick={() => setVisiblePrivateKey(!visiblePrivateKey)}
-                >
-                  {visiblePrivateKey ? (
-                    <EyeOff className="size-4" />
-                  ) : (
-                    <Eye className="size-4" />
-                  )}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 };
