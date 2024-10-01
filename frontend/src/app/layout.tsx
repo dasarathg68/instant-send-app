@@ -7,6 +7,7 @@ import "@telegram-apps/telegram-ui/dist/styles.css";
 import "normalize.css/normalize.css";
 import "./_assets/globals.css";
 import { ThemeProvider } from "@/components/themeprovider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Your Application Title Goes Here",
@@ -23,6 +24,8 @@ export default function RootLayout({ children }: PropsWithChildren) {
           enableSystem
           disableTransitionOnChange
         >
+          <Toaster />
+
           <Root>{children}</Root>
         </ThemeProvider>
       </body>

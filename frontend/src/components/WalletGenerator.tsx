@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ChevronDown, ChevronUp, Copy, Eye, EyeOff } from "lucide-react";
+import { Copy } from "lucide-react";
 
 import {
   generateWalletFromMnemonic,
