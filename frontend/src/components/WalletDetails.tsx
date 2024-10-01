@@ -16,6 +16,12 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import { Wallet } from "@/utils/wallet";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
 interface WalletDetailsProps {
   network: "Ethereum" | "Solana";
@@ -45,74 +51,77 @@ const WalletDetails: React.FC<WalletDetailsProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-between w-full gap-4 items-center">
-        <h2 className="tracking-tighter text-3xl md:text-4xl font-extrabold">
-          {network} Wallet
-        </h2>
-      </div>
-      <div className="flex flex-col gap-8 px-8 py-4 rounded-2xl bg-secondary/50">
-        <div
-          className="flex flex-col w-full gap-2"
-          onClick={() => copyToClipboard(wallet.publicKey)}
-        >
-          <span className="text-lg md:text-xl font-bold tracking-tighter">
-            Public Key
-          </span>
-          <p className="text-primary/80 font-medium cursor-pointer hover:text-primary transition-all duration-300 truncate">
-            {wallet.publicKey}
-          </p>
-        </div>
-        <div className="flex flex-col w-full gap-2">
-          <span className="text-lg md:text-xl font-bold tracking-tighter">
-            Private Key
-          </span>
-          <div className="flex justify-between w-full items-center gap-2">
-            <p
-              onClick={() => copyToClipboard(wallet.privateKey)}
-              className="text-primary/80 font-medium cursor-pointer hover:text-primary transition-all duration-300 truncate"
+    <Accordion type="single" collapsible className="w-full">
+      <AccordionItem value="wallet-details">
+        <AccordionTrigger>
+          <h2 className="tracking-tighter text-3xl md:text-2xl font-extrabold">
+            {network} Wallet
+          </h2>
+        </AccordionTrigger>
+        <AccordionContent>
+          <div className="flex flex-col gap-8 px-8 py-4 rounded-2xl bg-secondary/50">
+            <div
+              className="flex flex-col w-full gap-2"
+              onClick={() => copyToClipboard(wallet.publicKey)}
             >
-              {visiblePrivateKey ? wallet.privateKey : "•".repeat(12)}
-            </p>
-            <Button
-              variant="ghost"
-              onClick={() => setVisiblePrivateKey(!visiblePrivateKey)}
-            >
-              {visiblePrivateKey ? (
-                <EyeOff className="size-4" />
-              ) : (
-                <Eye className="size-4" />
-              )}
-            </Button>
+              <span className="text-lg md:text-xl font-bold tracking-tighter">
+                Public Key
+              </span>
+              <p className="text-primary/80 font-medium cursor-pointer hover:text-primary transition-all duration-300 truncate">
+                {wallet.publicKey}
+              </p>
+            </div>
+            <div className="flex flex-col w-full gap-2">
+              <span className="text-lg md:text-xl font-bold tracking-tighter">
+                Private Key
+              </span>
+              <div className="flex justify-between w-full items-center gap-2">
+                <p
+                  onClick={() => copyToClipboard(wallet.privateKey)}
+                  className="text-primary/80 font-medium cursor-pointer hover:text-primary transition-all duration-300 truncate"
+                >
+                  {visiblePrivateKey ? wallet.privateKey : "•".repeat(12)}
+                </p>
+                <Button
+                  variant="ghost"
+                  onClick={() => setVisiblePrivateKey(!visiblePrivateKey)}
+                >
+                  {visiblePrivateKey ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <div className="flex justify-center items-center">
+                  <Button variant="destructive">Delete Wallet</Button>
+                </div>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Are you sure you want to delete this wallet?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    your wallet and keys from local storage.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteWallet}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
-        </div>
-      </div>
-
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button variant="destructive" className="self-end">
-            Delete Wallet
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you sure you want to delete this wallet?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              wallet and keys from local storage.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteWallet}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
 
