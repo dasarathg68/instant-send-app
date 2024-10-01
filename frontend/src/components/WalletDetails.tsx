@@ -35,7 +35,6 @@ const WalletDetails: React.FC<WalletDetailsProps> = ({
   }
 
   const handleDeleteWallet = () => {
-    localStorage.removeItem(`${network}_wallet`);
     onWalletDelete();
     toast.success(`${network} Wallet deleted successfully!`);
   };

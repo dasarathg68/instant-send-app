@@ -50,12 +50,7 @@ const WalletGenerator: React.FC<WalletGeneratorProps> = ({
 
   // Load wallet from local storage (mnemonic is not stored anymore)
   useEffect(() => {
-    const storedWallet = localStorage.getItem(`${network}_wallet`);
-
-    if (storedWallet) {
-      onWalletCreated(JSON.parse(storedWallet));
-      setVisiblePrivateKey(false);
-    }
+    setVisiblePrivateKey(false);
   }, [network]);
 
   const copyToClipboard = (content: string) => {
@@ -88,7 +83,6 @@ const WalletGenerator: React.FC<WalletGeneratorProps> = ({
     const newWallet = generateWalletFromMnemonic(pathType, mnemonic, 0); // Only 1 account (index 0)
     if (newWallet) {
       onWalletCreated(newWallet);
-      localStorage.setItem(`${network}_wallet`, JSON.stringify(newWallet));
       toast.success("Wallet generated successfully!");
 
       // Clear mnemonic after 60 seconds
