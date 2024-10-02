@@ -6,6 +6,7 @@ import { Wallet } from "@/utils/wallet";
 import WalletDetails from "@/components/WalletDetails";
 import WalletGenerator from "@/components/WalletGenerator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Session } from "@/components/Session";
 
 export default function Home() {
   const [walletEthereum, setWalletEthereum] = useState<Wallet | null>(
@@ -17,6 +18,7 @@ export default function Home() {
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-4 p-4 min-h-[92vh]">
       <Navbar />
+      <Session />
       <Tabs defaultValue="Ethereum">
         <TabsList className="flex space-x-4 mb-6">
           <TabsTrigger value="Ethereum">Ethereum</TabsTrigger>
