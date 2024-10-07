@@ -1,5 +1,13 @@
 import { Bot, InlineKeyboard } from "grammy";
 import dotenv from "dotenv";
+import express from "express";
+
+const app = express();
+const PORT = process.env.PORT || 8080;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 
 dotenv.config();
 
@@ -27,4 +35,16 @@ bot.on("message", (ctx) => {
   ctx.reply("Got another message!");
 });
 
-bot.start();
+const startServer = async () => {
+  try {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+      bot.start();
+    });
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+};
+
+startServer();
