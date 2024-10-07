@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { Wallet } from "@/utils/wallet";
 import WalletDetails from "@/components/WalletDetails";
 import WalletGenerator from "@/components/WalletGenerator";
+import EthereumWallet from "@/components/EthereumWallet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export default function Home() {
@@ -39,6 +40,11 @@ export default function Home() {
               localStorage.removeItem(`Ethereum_wallet`);
             }}
           />
+          {walletEthereum ? (
+            <EthereumWallet wallet={walletEthereum} />
+          ) : (
+            <div>Wallet not found</div>
+          )}
         </TabsContent>
         <TabsContent value="Solana">
           <WalletGenerator
