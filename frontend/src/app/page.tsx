@@ -4,9 +4,16 @@ import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wallet } from "@/utils/wallet";
 import { useInitData } from "@telegram-apps/sdk-react";
+import { Send } from "lucide-react";
 import instance from "@/utils/axios";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { User } from "lucide-react";
 import Contacts from "@/components/Contacts";
 import WalletDetails from "@/components/WalletDetails";
@@ -136,7 +143,19 @@ export default function Home() {
                               localStorage.removeItem(`Ethereum_wallet`);
                             }}
                           />
-                          <EthereumWallet wallet={walletEthereum} />
+                          <div className="mt-4 flex justify-center">
+                            <Popover>
+                              <PopoverTrigger>
+                                <Button variant="outline" size="sm">
+                                  <Send className="h-4 w-4" />
+                                  Send Stablecoins
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent>
+                                <EthereumWallet wallet={walletEthereum} />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
                         </>
                       )}
                     </motion.div>
