@@ -1,4 +1,4 @@
-import { Bot, InlineKeyboard } from "grammy";
+import { Bot, InlineKeyboard, webhookCallback } from "grammy";
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
@@ -140,3 +140,4 @@ const startServer = async () => {
 };
 
 startServer();
+export default webhookCallback(bot, "std/http");
