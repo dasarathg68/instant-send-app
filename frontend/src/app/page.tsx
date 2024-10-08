@@ -1,14 +1,41 @@
 "use client";
 
 import Navbar from "@/components/NavBar";
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Wallet } from "@/utils/wallet";
 import WalletDetails from "@/components/WalletDetails";
 import WalletGenerator from "@/components/WalletGenerator";
 import EthereumWallet from "@/components/EthereumWallet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useInitData } from "@telegram-apps/sdk-react";
+import axios from "axios";
 
 export default function Home() {
+  const initData = useInitData();
+  const [contacts, setContacts] = useState([]);
+
+  const currentUser = useMemo(() => {
+    return initData && initData.user
+      ? {
+          id: initData.user.id.toString(),
+          username: initData.user.username,
+          name: initData.user.firstName + " " + initData.user.lastName,
+        }
+      : undefined;
+  }, [initData]);
+  const getContacts = async () => {
+    await axios
+      .get(`http://localhost:8080/getContacts/${currentUser?.id}`)
+      .then((res) => {
+        setContacts(res.data);
+      });
+  };
+  useEffect(() => {
+    if (currentUser) {
+      console.log("Current user:", currentUser);
+      getContacts();
+    }
+  }, []);
   const [walletEthereum, setWalletEthereum] = useState<Wallet | null>(
     JSON.parse(localStorage.getItem(`Ethereum_wallet`) || "null")
   );

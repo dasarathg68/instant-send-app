@@ -1,15 +1,37 @@
 import { Bot, InlineKeyboard } from "grammy";
 import dotenv from "dotenv";
 import express from "express";
+import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 const app = express();
+app.use(cors());
 const PORT = process.env.PORT || 8080;
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
+});
+app.get("/getContacts/:id", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const contacts = await prisma.contacts.findMany({
+      where: {
+        userId,
+      },
+    });
+    const contactsWithStringIds = contacts.map((contact) => ({
+      ...contact,
+      id: contact.id.toString(),
+      userId: contact.userId.toString(),
+    }));
+
+    res.json(contactsWithStringIds);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error retrieving contacts.");
+  }
 });
 
 dotenv.config();
