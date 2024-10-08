@@ -39,7 +39,7 @@ export default function Component(
   const handleDeleteContact = async (contactId: string) => {
     console.log("Deleting contact with id:", contactId);
     try {
-      await instance.delete(`http://localhost:8080/deleteContact/${contactId}`);
+      await instance.delete(`/deleteContact/${contactId}`);
       toast.success("Contact deleted successfully");
       handleRefresh();
     } catch (err) {
