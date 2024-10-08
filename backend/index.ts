@@ -57,8 +57,9 @@ const bot = createBot(process.env.BOT_TOKEN);
 
 const startServer = async () => {
   try {
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
       console.log(`Server is running on port ${PORT}`);
+      await bot.start();
     });
   } catch (err) {
     console.error(err);
@@ -66,5 +67,4 @@ const startServer = async () => {
   }
 };
 
-bot.start();
 startServer();
