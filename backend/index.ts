@@ -140,12 +140,12 @@ const startServer = async () => {
   try {
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
-      bot.start();
     });
   } catch (err) {
     console.error(err);
     process.exit(1);
   }
 };
+bot.start();
 
 startServer();
