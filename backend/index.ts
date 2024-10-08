@@ -1,4 +1,4 @@
-import { Bot, InlineKeyboard, webhookCallback } from "grammy";
+import { Bot, InlineKeyboard } from "grammy";
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
@@ -52,7 +52,7 @@ if (!process.env.BOT_TOKEN) {
 }
 
 const bot = new Bot(process.env.BOT_TOKEN); // <-- put your bot token between the ""
-app.use(webhookCallback(bot, "express"));
+// app.use(webhookCallback(bot, "express"));
 bot.api.getMe().then((me) => {
   console.log(`Bot started as ${me.username}`);
 });
