@@ -59,8 +59,8 @@ const startServer = async () => {
   try {
     app.listen(PORT, async () => {
       console.log(`Server is running on port ${PORT}`);
-      await bot.start();
     });
+    await bot.start();
   } catch (err) {
     console.error(err);
     process.exit(1);
