@@ -1,6 +1,9 @@
 import { Bot, InlineKeyboard } from "grammy";
 import dotenv from "dotenv";
 import express from "express";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -30,9 +33,67 @@ bot.command("start", async (ctx) => {
     });
   }
 });
-bot.on("message", (ctx) => {
-  console.log(ctx.update.message.contact); // <-- log the contact object
-  ctx.reply("Got another message!");
+bot.on("message", async (ctx) => {
+  console.log(ctx.update.message.contact); // Log the contact object
+  try {
+    if (ctx.update.message.contact) {
+      ctx.reply("Got a contact!");
+
+      const contactUserId = ctx.update.message.contact.user_id;
+      const contactFirstName = ctx.update.message.contact.first_name || "";
+      const contactLastName = ctx.update.message.contact.last_name || "";
+      const contactName = contactFirstName + " " + contactLastName;
+
+      // Check if contact's user ID is available
+      if (!contactUserId) {
+        return ctx.reply("User ID is missing for the contact.");
+      }
+
+      // Information from the message sender
+      const senderId = ctx.update.message.from.id;
+      const senderFirstName = ctx.update.message.from.first_name || "";
+      const senderLastName = ctx.update.message.from.last_name || "";
+      const senderName = senderFirstName + " " + senderLastName;
+
+      // First, ensure the user (message sender) exists or create if not
+      await prisma.user.upsert({
+        where: { id: senderId },
+        update: {},
+        create: {
+          id: senderId,
+          name: senderName,
+        },
+      });
+
+      // Now check if the contact already exists for this user
+      const existingContact = await prisma.contacts.findFirst({
+        where: {
+          id: contactUserId,
+          userId: senderId,
+        },
+      });
+
+      if (existingContact) {
+        ctx.reply("This contact is already saved.");
+      } else {
+        // If contact doesn't exist, create it and link to the user
+        await prisma.contacts.create({
+          data: {
+            id: contactUserId,
+            name: contactName,
+            user: {
+              connect: { id: senderId }, // Link to the existing user
+            },
+          },
+        });
+
+        ctx.reply("Contact saved successfully.");
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    ctx.reply("An error occurred while processing the message.");
+  }
 });
 
 const startServer = async () => {
