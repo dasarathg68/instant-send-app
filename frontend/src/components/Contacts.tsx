@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronsUpDown, Contact, Trash, RefreshCw } from "lucide-react";
+import { ChevronsUpDown, Contact, Trash, RefreshCw, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -129,6 +129,12 @@ export default function Component(
                 </AlertDialog>
               </motion.div>
             ))}
+            <div className="flex items-center space-x-2 rounded-md border px-4 py-3 text-sm text-muted-foreground">
+              <Info className="h-4 w-4" />
+              <span className="text-xs">
+                To add more contacts, share a contact to @InstantSendAppBot
+              </span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
