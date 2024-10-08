@@ -2,6 +2,7 @@
 
 import Navbar from "@/components/NavBar";
 import React, { useState, useMemo, useEffect } from "react";
+
 import { Wallet } from "@/utils/wallet";
 import WalletDetails from "@/components/WalletDetails";
 import WalletGenerator from "@/components/WalletGenerator";
@@ -9,6 +10,7 @@ import EthereumWallet from "@/components/EthereumWallet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useInitData } from "@telegram-apps/sdk-react";
 import axios from "axios";
+import Contacts from "@/components/Contacts";
 
 export default function Home() {
   const initData = useInitData();
@@ -45,8 +47,15 @@ export default function Home() {
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-4 p-4 min-h-[92vh]">
       <Navbar />
+      <Contacts
+        contacts={contacts}
+        handleRefresh={async () => {
+          await getContacts();
+        }}
+      />
+
       <Tabs defaultValue="Ethereum">
-        <TabsList className="flex space-x-4 mb-6">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="Ethereum">Ethereum</TabsTrigger>
           <TabsTrigger value="Solana">Solana</TabsTrigger>
         </TabsList>

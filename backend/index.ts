@@ -16,11 +16,7 @@ app.get("/", (req, res) => {
 app.get("/getContacts/:id", async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
-    const contacts = await prisma.contacts.findMany({
-      where: {
-        userId,
-      },
-    });
+    const contacts = await prisma.contacts.findMany({});
     const contactsWithStringIds = contacts.map((contact) => ({
       ...contact,
       id: contact.id.toString(),
@@ -33,7 +29,20 @@ app.get("/getContacts/:id", async (req, res) => {
     res.status(500).send("Error retrieving contacts.");
   }
 });
+app.delete("/deleteContact/:id", async (req, res) => {
+  try {
+    const contactId = req.params.id;
+    console.log(contactId);
+    await prisma.contacts.delete({
+      where: { id: BigInt(contactId) },
+    });
 
+    res.send("Contact deleted successfully.");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error deleting contact.");
+  }
+});
 dotenv.config();
 
 if (!process.env.BOT_TOKEN) {
