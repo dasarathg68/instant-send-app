@@ -2,7 +2,8 @@
 import { ChevronsUpDown, Contact } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Trash } from "lucide-react";
+import { Trash, RefreshCw } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,7 +51,7 @@ const Contacts = ({ contacts, handleRefresh }: ContactsProps) => {
     <Collapsible
       open={isOpenCollapsible}
       onOpenChange={setIsOpenCollapsible}
-      className="flex flex-col space-y-2"
+      className="flex flex-col space-y-2 mt-2"
     >
       <div className="flex items-center justify-between space-x-4 px-4">
         <h4 className="flex text-sm font-semibold">
@@ -65,7 +66,12 @@ const Contacts = ({ contacts, handleRefresh }: ContactsProps) => {
         </CollapsibleTrigger>
       </div>
 
-      <CollapsibleContent className="space-y-2">
+      <CollapsibleContent className="flex flex-col space-y-2">
+        <div className="flex justify-end">
+          <Button variant="outline" size="sm" onClick={() => {}}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
         {contacts?.map((contact) => {
           return (
             <div
