@@ -59,69 +59,65 @@ const EthereumWallet: React.FC<EthereumWalletProps> = ({ wallet }) => {
   };
 
   return (
-    <div className="flex justify-center items-center mt-4 ">
-      <Card className="w-full max-w-lg">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold">Send Stablecoins</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSendStablecoins)}
-              className="space-y-8"
-            >
-              {/* Recipient Address Field */}
-              <FormField
-                control={form.control}
-                name="recipient"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="recipient">
-                      Recipient TG handle
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        id="recipient"
-                        placeholder="Enter recipient TG handle"
-                        {...field}
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <Card className="w-full max-w-lg">
+      <CardHeader>
+        <CardTitle className="text-xl font-bold">Send Stablecoins</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSendStablecoins)}
+            className="space-y-8"
+          >
+            {/* Recipient Address Field */}
+            <FormField
+              control={form.control}
+              name="recipient"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="recipient">Recipient TG handle</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="recipient"
+                      placeholder="Enter recipient TG handle"
+                      {...field}
+                      className="w-full"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              {/* Amount Field */}
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="amount">Amount (USDT/USDC)</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="amount"
-                        placeholder="Enter amount"
-                        {...field}
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* Amount Field */}
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="amount">Amount (USDT/USDC)</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="amount"
+                      placeholder="Enter amount"
+                      {...field}
+                      className="w-full"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <div className="mt-4">
-                <Button type="submit" disabled={isLoading} className="w-full ">
-                  {isLoading ? "Sending..." : "Send Stablecoins"}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+            <div className="mt-4">
+              <Button type="submit" disabled={isLoading} className="w-full ">
+                {isLoading ? "Sending..." : "Send"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 };
 
