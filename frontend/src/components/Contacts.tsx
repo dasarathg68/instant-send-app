@@ -20,7 +20,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import axios from "axios";
+import instance from "@/utils/axios";
 import { toast } from "sonner";
 interface Contact {
   id: string;
@@ -37,7 +37,7 @@ const Contacts = ({ contacts, handleRefresh }: ContactsProps) => {
   const handleDeleteWallet = async (contactId: string) => {
     console.log("Deleting wallet");
     try {
-      await axios.delete(`http://localhost:8080/deleteContact/${contactId}`);
+      await instance.delete(`http://localhost:8080/deleteContact/${contactId}`);
 
       toast.success("Contact deleted successfully");
       handleRefresh();

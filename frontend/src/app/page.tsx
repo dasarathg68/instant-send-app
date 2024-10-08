@@ -9,7 +9,7 @@ import WalletGenerator from "@/components/WalletGenerator";
 import EthereumWallet from "@/components/EthereumWallet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useInitData } from "@telegram-apps/sdk-react";
-import axios from "axios";
+import instance from "@/utils/axios";
 import Contacts from "@/components/Contacts";
 
 export default function Home() {
@@ -26,11 +26,9 @@ export default function Home() {
       : undefined;
   }, [initData]);
   const getContacts = async () => {
-    await axios
-      .get(`http://localhost:8080/getContacts/${currentUser?.id}`)
-      .then((res) => {
-        setContacts(res.data);
-      });
+    await instance.get(`/getContacts/${currentUser?.id}`).then((res) => {
+      setContacts(res.data);
+    });
   };
   useEffect(() => {
     if (currentUser) {
