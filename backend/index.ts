@@ -53,6 +53,9 @@ if (!process.env.BOT_TOKEN) {
 
 const bot = new Bot(process.env.BOT_TOKEN); // <-- put your bot token between the ""
 app.use(webhookCallback(bot, "express"));
+bot.api.getMe().then((me) => {
+  console.log(`Bot started as ${me.username}`);
+});
 
 bot.command("start", async (ctx) => {
   if (process.env.WEBAPP_URL) {
@@ -132,6 +135,7 @@ const startServer = async () => {
   try {
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
+      bot.start();
     });
   } catch (err) {
     console.error(err);
