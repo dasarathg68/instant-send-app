@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wallet } from "@/utils/wallet";
 import { useInitData } from "@telegram-apps/sdk-react";
-import { Send } from "lucide-react";
+import { Send, User } from "lucide-react";
 import instance from "@/utils/axios";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +14,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { User } from "lucide-react";
 import Contacts from "@/components/Contacts";
 import WalletDetails from "@/components/WalletDetails";
 import WalletGenerator from "@/components/WalletGenerator";
@@ -23,22 +22,21 @@ import EthereumWallet from "@/components/EthereumWallet";
 export default function Home() {
   const initData = useInitData();
   const [contacts, setContacts] = useState([]);
-  const [walletEthereum, setWalletEthereum] = useState<Wallet | null>(
+  const [walletEthereum, setWalletEthereum] = useState<Wallet | null>(() =>
     JSON.parse(localStorage.getItem(`Ethereum_wallet`) || "null")
   );
-  const [walletSolana, setWalletSolana] = useState<Wallet | null>(
+  const [walletSolana, setWalletSolana] = useState<Wallet | null>(() =>
     JSON.parse(localStorage.getItem(`Solana_wallet`) || "null")
   );
 
   const currentUser = useMemo(() => {
-    console.log("Init data:", initData);
-    return initData && initData.user
-      ? {
-          id: initData.user.id.toString(),
-          username: initData.user.username,
-          name: initData.user.firstName + " " + initData.user.lastName,
-        }
-      : undefined;
+    if (!initData?.user) return undefined;
+    const { id, username, firstName, lastName } = initData.user;
+    return {
+      id: id.toString(),
+      username,
+      name: `${firstName} ${lastName}`,
+    };
   }, [initData]);
 
   const getContacts = async () => {
@@ -50,10 +48,21 @@ export default function Home() {
 
   useEffect(() => {
     if (currentUser) {
-      console.log("Current user:", currentUser);
       getContacts();
     }
   }, [currentUser]);
+
+  const handleWalletCreation = (network: string) => (wallet: Wallet) => {
+    localStorage.setItem(`${network}_wallet`, JSON.stringify(wallet));
+    if (network === "Ethereum") setWalletEthereum(wallet);
+    else if (network === "Solana") setWalletSolana(wallet);
+  };
+
+  const handleWalletDeletion = (network: string) => () => {
+    localStorage.removeItem(`${network}_wallet`);
+    if (network === "Ethereum") setWalletEthereum(null);
+    else if (network === "Solana") setWalletSolana(null);
+  };
 
   return (
     <motion.div
@@ -113,84 +122,64 @@ export default function Home() {
                   <TabsTrigger value="Ethereum">Ethereum</TabsTrigger>
                   <TabsTrigger value="Solana">Solana</TabsTrigger>
                 </TabsList>
-                <AnimatePresence mode="wait">
-                  <TabsContent value="Ethereum" className="space-y-4">
-                    <motion.div
-                      key="ethereum"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <WalletGenerator
-                        wallet={walletEthereum}
-                        network="Ethereum"
-                        onWalletCreated={(wallet) => {
-                          localStorage.setItem(
-                            `Ethereum_wallet`,
-                            JSON.stringify(wallet)
-                          );
-                          setWalletEthereum(wallet);
-                        }}
-                      />
-                      {walletEthereum && (
-                        <>
-                          <WalletDetails
-                            wallet={walletEthereum}
-                            network="Ethereum"
-                            onWalletDelete={() => {
-                              setWalletEthereum(null);
-                              localStorage.removeItem(`Ethereum_wallet`);
-                            }}
+                <AnimatePresence mode="sync">
+                  {(["Ethereum", "Solana"] as const).map((network) => {
+                    const wallet =
+                      network === "Ethereum" ? walletEthereum : walletSolana;
+                    const handleCreation = handleWalletCreation(network);
+                    const handleDeletion = handleWalletDeletion(network);
+
+                    return (
+                      <TabsContent
+                        key={network}
+                        value={network}
+                        className="space-y-4"
+                      >
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <WalletGenerator
+                            wallet={wallet}
+                            network={network}
+                            onWalletCreated={handleCreation}
                           />
-                          <div className="mt-4 flex justify-center">
-                            <Popover>
-                              <PopoverTrigger>
-                                <Button variant="outline" size="sm">
-                                  <Send className="h-4 w-4" />
-                                  Send Stablecoins
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent>
-                                <EthereumWallet wallet={walletEthereum} />
-                              </PopoverContent>
-                            </Popover>
-                          </div>
-                        </>
-                      )}
-                    </motion.div>
-                  </TabsContent>
-                  <TabsContent value="Solana" className="space-y-4">
-                    <motion.div
-                      key="solana"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <WalletGenerator
-                        wallet={walletSolana}
-                        network="Solana"
-                        onWalletCreated={(wallet) => {
-                          localStorage.setItem(
-                            `Solana_wallet`,
-                            JSON.stringify(wallet)
-                          );
-                          setWalletSolana(wallet);
-                        }}
-                      />
-                      {walletSolana && (
-                        <WalletDetails
-                          wallet={walletSolana}
-                          network="Solana"
-                          onWalletDelete={() => {
-                            setWalletSolana(null);
-                            localStorage.removeItem(`Solana_wallet`);
-                          }}
-                        />
-                      )}
-                    </motion.div>
-                  </TabsContent>
+                          {wallet && (
+                            <>
+                              <WalletDetails
+                                wallet={wallet}
+                                network={network}
+                                onWalletDelete={handleDeletion}
+                              />
+                              {network === "Ethereum" && (
+                                <div className="mt-4 flex justify-center">
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <div>
+                                        <Button variant="outline" size="sm">
+                                          <Send className="h-4 w-4 mr-2" />
+                                          Send Stablecoins
+                                        </Button>
+                                      </div>
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                      {walletEthereum && (
+                                        <EthereumWallet
+                                          wallet={walletEthereum}
+                                        />
+                                      )}
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </motion.div>
+                      </TabsContent>
+                    );
+                  })}
                 </AnimatePresence>
               </Tabs>
             </CardContent>
