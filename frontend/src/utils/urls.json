@@ -1,4 +1,4 @@
 {
   "development": "http://localhost:8080",
-  "production": ""
+  "production": "https://instant-send-app-backend-nine.vercel.app"
 }
