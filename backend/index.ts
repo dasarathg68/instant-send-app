@@ -53,9 +53,14 @@ if (!process.env.BOT_TOKEN) {
 
 const bot = new Bot(process.env.BOT_TOKEN); // <-- put your bot token between the ""
 // app.use(webhookCallback(bot, "express"));
-bot.api.getMe().then((me) => {
-  console.log(`Bot started as ${me.username}`);
-});
+bot.api
+  .getMe()
+  .then((me) => {
+    console.log(`Bot started as ${me.username}`);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 bot.command("start", async (ctx) => {
   if (process.env.WEBAPP_URL) {
