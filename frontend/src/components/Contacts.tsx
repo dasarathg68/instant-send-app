@@ -1,9 +1,9 @@
 "use client";
-import { ChevronsUpDown, Contact } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Trash, RefreshCw } from "lucide-react";
 
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronsUpDown, Contact, Trash, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,32 +14,32 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "./ui/alert-dialog";
-
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@/components/ui/alert-dialog";
 import instance from "@/utils/axios";
 import { toast } from "sonner";
+
 interface Contact {
   id: string;
   name: string;
   username: string;
 }
+
 interface ContactsProps {
   contacts: Contact[];
   handleRefresh: () => void;
 }
 
-const Contacts = ({ contacts, handleRefresh }: ContactsProps) => {
+export default function Component(
+  { contacts, handleRefresh }: ContactsProps = {
+    contacts: [],
+    handleRefresh: () => {},
+  }
+) {
   const [isOpenCollapsible, setIsOpenCollapsible] = useState(false);
   const handleDeleteContact = async (contactId: string) => {
     console.log("Deleting contact with id:", contactId);
     try {
       await instance.delete(`http://localhost:8080/deleteContact/${contactId}`);
-
       toast.success("Contact deleted successfully");
       handleRefresh();
     } catch (err) {
@@ -47,10 +47,11 @@ const Contacts = ({ contacts, handleRefresh }: ContactsProps) => {
       console.error(err);
     }
   };
+
   return (
-    <Collapsible
-      open={isOpenCollapsible}
-      onOpenChange={setIsOpenCollapsible}
+    <motion.div
+      initial={false}
+      animate={isOpenCollapsible ? "open" : "closed"}
       className="flex flex-col space-y-2 mt-2"
     >
       <div className="flex items-center justify-between space-x-4 px-4">
@@ -58,58 +59,79 @@ const Contacts = ({ contacts, handleRefresh }: ContactsProps) => {
           <Contact className="h-4 w-4" />
         </h4>
         <span>Contacts</span>
-        <CollapsibleTrigger asChild>
-          <Button variant="ghost" size="sm" className="w-9 p-0">
-            <ChevronsUpDown className="h-4 w-4" />
-            <span className="sr-only">Toggle</span>
-          </Button>
-        </CollapsibleTrigger>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => setIsOpenCollapsible(!isOpenCollapsible)}
+          className="w-9 p-0"
+        >
+          <ChevronsUpDown className="h-4 w-4" />
+          <span className="sr-only">Toggle</span>
+        </motion.button>
       </div>
 
-      <CollapsibleContent className="flex flex-col space-y-2">
-        <div className="flex justify-end">
-          <Button variant="outline" size="sm" onClick={() => {}}>
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-        </div>
-        {contacts?.map((contact) => {
-          return (
-            <div
-              key={(contact as any).id}
-              className="flex justify-between rounded-md border px-4 py-3 font-mono text-sm"
-            >
-              {(contact as any).name}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <div className="flex justify-center items-center">
-                    <Trash className="w-4 h-4" />
-                  </div>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you sure you want to delete this contact?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will delete the contact from CTRL wallet.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => handleDeleteContact((contact as any).id)}
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+      <AnimatePresence initial={false}>
+        {isOpenCollapsible && (
+          <motion.div
+            key="content"
+            initial="collapsed"
+            animate="open"
+            exit="collapsed"
+            variants={{
+              open: { opacity: 1, height: "auto" },
+              collapsed: { opacity: 0, height: 0 },
+            }}
+            transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+            className="flex flex-col space-y-2"
+          >
+            <div className="flex justify-end">
+              <Button variant="outline" size="sm" onClick={handleRefresh}>
+                <RefreshCw className="h-4 w-4" />
+              </Button>
             </div>
-          );
-        })}
-      </CollapsibleContent>
-    </Collapsible>
+            {contacts?.map((contact) => (
+              <motion.div
+                key={contact.id}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="flex justify-between rounded-md border px-4 py-3 font-mono text-sm"
+              >
+                {contact.name}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="flex justify-center items-center cursor-pointer"
+                    >
+                      <Trash className="w-4 h-4" />
+                    </motion.div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you sure you want to delete this contact?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will delete the contact from CTRL wallet.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteContact(contact.id)}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
-};
-
-export default Contacts;
+}
