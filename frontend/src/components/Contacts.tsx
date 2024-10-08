@@ -34,8 +34,8 @@ interface ContactsProps {
 
 const Contacts = ({ contacts, handleRefresh }: ContactsProps) => {
   const [isOpenCollapsible, setIsOpenCollapsible] = useState(false);
-  const handleDeleteWallet = async (contactId: string) => {
-    console.log("Deleting wallet");
+  const handleDeleteContact = async (contactId: string) => {
+    console.log("Deleting contact with id:", contactId);
     try {
       await instance.delete(`http://localhost:8080/deleteContact/${contactId}`);
 
@@ -91,7 +91,7 @@ const Contacts = ({ contacts, handleRefresh }: ContactsProps) => {
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() => handleDeleteWallet((contact as any).id)}
+                      onClick={() => handleDeleteContact((contact as any).id)}
                     >
                       Delete
                     </AlertDialogAction>
