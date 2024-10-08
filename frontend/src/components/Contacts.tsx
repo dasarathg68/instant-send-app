@@ -80,7 +80,7 @@ export default function Component(
               open: { opacity: 1, height: "auto" },
               collapsed: { opacity: 0, height: 0 },
             }}
-            transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+            transition={{ duration: 0.5, ease: [0, 0, 0.58, 1] }}
             className="flex flex-col space-y-2"
           >
             <div className="flex justify-end">
