@@ -11,8 +11,8 @@ import { ThemeProvider } from "@/components/themeprovider";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "Your Application Title Goes Here",
-  description: "Your application description goes here",
+  title: "Instant Send App by CTRL",
+  description: "Instant Send App by CTRL",
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
