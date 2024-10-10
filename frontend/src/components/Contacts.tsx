@@ -1,9 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronsUpDown, Contact, Trash, RefreshCw, Info } from "lucide-react";
+import {
+  ChevronsUpDown,
+  Contact,
+  Trash,
+  RefreshCw,
+  Info,
+  Search,
+  Copy,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +25,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Card, CardContent } from "@/components/ui/card";
 import instance from "@/utils/axios";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Contact {
   id: string;
@@ -29,46 +41,63 @@ interface ContactsProps {
   handleRefresh: () => void;
 }
 
-export default function Component(
-  { contacts, handleRefresh }: ContactsProps = {
-    contacts: [],
-    handleRefresh: () => {},
-  }
-) {
+export default function Component({
+  contacts = [],
+  handleRefresh = () => {},
+}: ContactsProps) {
   const [isOpenCollapsible, setIsOpenCollapsible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const filteredContacts = useMemo(() => {
+    return contacts.filter(
+      (contact) =>
+        contact.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contact.username?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [contacts, searchQuery]);
+
   const handleDeleteContact = async (contactId: string) => {
     console.log("Deleting contact with id:", contactId);
     try {
+      setIsLoading(true);
       await instance.delete(`contacts/deleteContact/${contactId}`);
       toast.success("Contact deleted successfully");
       handleRefresh();
     } catch (err) {
       toast.error("Error deleting contact");
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const copyUsername = useCallback((username: string) => {
+    if (username) {
+      navigator.clipboard.writeText(username);
+      toast.success("Username copied to clipboard");
+    } else {
+      toast.error(
+        "No username found, invite the user to InstantSendAppBot to get their username"
+      );
+    }
+  }, []);
+
   return (
-    <motion.div
-      initial={false}
-      animate={isOpenCollapsible ? "open" : "closed"}
-      className="flex flex-col space-y-2 mt-2"
-    >
-      <div className="flex items-center justify-between space-x-4 px-4">
-        <h4 className="flex text-sm font-semibold">
-          <Contact className="h-4 w-4" />
-        </h4>
+    <motion.div animate={isOpenCollapsible ? "open" : "closed"}>
+      <div className="flex flex-row items-center justify-between mt-3 ">
+        <Contact className="h-4 w-4" />
         <span>Contacts</span>
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={() => setIsOpenCollapsible(!isOpenCollapsible)}
           className="w-9 p-0"
+          aria-expanded={isOpenCollapsible}
+          aria-label="Toggle contacts list"
         >
-          <ChevronsUpDown className="h-4 w-4" />
-          <span className="sr-only">Toggle</span>
+          <ChevronsUpDown className="h-4 w-3" />
         </motion.button>
       </div>
-
       <AnimatePresence initial={false}>
         {isOpenCollapsible && (
           <motion.div
@@ -83,54 +112,117 @@ export default function Component(
             transition={{ duration: 0.5, ease: [0, 0, 0.58, 1] }}
             className="flex flex-col space-y-2"
           >
-            <div className="flex justify-end">
-              <Button variant="outline" size="sm" onClick={handleRefresh}>
-                <RefreshCw className="h-4 w-4" />
+            <div className="flex justify-between items-center">
+              <div className="relative flex-1 mr-2">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search contacts..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-8 pr-4 py-2 w-full"
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={isLoading}
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+                />
               </Button>
             </div>
-            {contacts?.map((contact) => (
-              <motion.div
-                key={contact.id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="flex justify-between rounded-md border px-4 py-3 font-mono text-sm"
-              >
-                {contact.name}
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
+            <div className="max-h-[300px] overflow-auto space-y-2">
+              {filteredContacts.map((contact) => (
+                <Card key={contact.id}>
+                  <CardContent className="p-4">
                     <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="flex justify-center items-center cursor-pointer"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex justify-between items-center"
                     >
-                      <Trash className="w-4 h-4" />
+                      <div className="flex items-center space-x-4">
+                        <Avatar>
+                          <AvatarFallback>
+                            {contact.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()
+                              .slice(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-semibold">{contact.name}</p>
+                          <p className="text-xs text-gray-500">
+                            @{contact.username}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyUsername(contact.username)}
+                          aria-label={`Copy ${contact.name}'s username`}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              aria-label={`Delete ${contact.name}`}
+                            >
+                              <Trash className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Delete Contact
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete {contact.name}{" "}
+                                from your contacts? This action cannot be
+                                undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteContact(contact.id)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </motion.div>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Are you sure you want to delete this contact?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will delete the contact from CTRL wallet.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDeleteContact(contact.id)}
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </motion.div>
-            ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {filteredContacts.length === 0 && !isLoading && (
+              <div className="text-center text-gray-500 py-4">
+                No contacts found
+              </div>
+            )}
+            {isLoading && (
+              <div className="space-y-2">
+                {[...Array(3)].map((_, index) => (
+                  <Skeleton key={index} className="h-[80px] w-full" />
+                ))}
+              </div>
+            )}
             <div className="flex items-center space-x-2 rounded-md border px-4 py-3 text-sm text-muted-foreground">
-              <Info className="h-4 w-4" />
+              <Info className="h-4 w-4 flex-shrink-0" />
               <span className="text-xs">
                 To add more contacts, share a contact to @InstantSendAppBot
               </span>
