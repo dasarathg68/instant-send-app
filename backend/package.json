@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "bot:pm2": "pm2 start ./start-bot.sh --name instant-send-bot",
     "bot": "nodemon bot.ts",
     "start": "nodemon index.ts",
     "vercel-build": "prisma generate && prisma migrate deploy && tsc"
