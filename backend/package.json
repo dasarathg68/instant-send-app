@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build":"tsc",
-    "pm2":"pm2 start npm --name \"instant-send-telegram-bot\" -- start",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "bot": "nodemon bot.ts",
     "start": "nodemon index.ts",
