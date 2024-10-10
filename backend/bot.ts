@@ -87,3 +87,18 @@ export function createBot(token: string) {
 
   return bot;
 }
+if (!process.env.BOT_TOKEN) {
+  throw new Error(
+    "Please provide a bot token in the environment variable BOT_TOKEN."
+  );
+}
+const bot = createBot(process.env.BOT_TOKEN);
+
+(async () => {
+  try {
+    await bot.start();
+    console.log("Bot started successfully");
+  } catch (error) {
+    console.error("Failed to start the bot:", error);
+  }
+})();
