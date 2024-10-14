@@ -34,7 +34,11 @@ export default function Home() {
 
   const getContacts = async () => {
     if (currentUser?.id) {
-      const res = await instance.get(`contacts/getContacts/${currentUser.id}`);
+      const res = await instance.get(`contacts/getContacts/${currentUser.id}`, {
+        params: {
+          initData: JSON.stringify(initData),
+        },
+      });
       setContacts(res.data);
     }
   };
