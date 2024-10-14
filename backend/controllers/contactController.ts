@@ -12,6 +12,7 @@ export const getContacts = async (req: Request, res: Response) => {
       id: contact.id.toString(),
       userId: contact.userId.toString(),
     }));
+    console.log("Getting contacts...");
 
     res.json(contactsWithStringIds);
   } catch (err) {
